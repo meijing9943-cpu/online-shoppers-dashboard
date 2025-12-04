@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Shoppers Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2.8rem;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 15px 0;
+        }
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .metric-change {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .positive { background: #d4edda; color: #155724; }
+        .negative { background: #f8d7da; color: #721c24; }
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .chart-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        .chart-box h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        .data-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            color: #2c3e50;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .revenue-yes {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .revenue-no {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .visitor-returning {
+            color: #3498db;
+            font-weight: 500;
+        }
+        .visitor-new {
+            color: #2ecc71;
+            font-weight: 500;
+        }
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            margin-top: 30px;
+            font-size: 0.95rem;
+        }
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🛒 Online Shoppers Intention Dashboard</h1>
+            <p>Final Year Project | Real-time Analytics & Insights</p>
+            <div style="margin-top: 15px;">
+                <span style="background: #e3f2fd; color: #1976d2; padding: 8px 20px; border-radius: 25px; font-weight: 500;">
+                    📊 Last Updated: <span id="currentTime"></span>
+                </span>
+            </div>
+        </div>
+        
+        <!-- Metrics -->
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-label">Total Visitors</div>
+                <div class="metric-value" id="metric1">0</div>
+                <div class="metric-change positive">↑ 12.5% from last month</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Conversion Rate</div>
+                <div class="metric-value" id="metric2">0%</div>
+                <div class="metric-change positive">↑ 3.2% from target</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg Page Value</div>
+                <div class="metric-value" id="metric3">$0</div>
+                <div class="metric-change positive">↑ $2.10 per visitor</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Returning Visitors</div>
+                <div class="metric-value" id="metric4">0</div>
+                <div class="metric-change positive">68.5% of total</div>
+            </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="charts-row">
+            <div class="chart-box">
+                <h3>📈 Monthly Performance Analysis</h3>
+                <canvas id="monthlyChart" height="250"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>👥 Visitor Type Distribution</h3>
+                <canvas id="visitorChart" height="250"></canvas>
+            </div>
+        </div>
+        
+        <!-- Data Table -->
+        <div class="data-section">
+            <h3>📋 Visitor Behavior Data</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Visitor ID</th>
+                        <th>Month</th>
+                        <th>Page Views</th>
+                        <th>Page Value</th>
+                        <th>Visitor Type</th>
+                        <th>Revenue Generated</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTable">
+                    <!-- Data will be loaded by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Online Shoppers Intention Analysis Dashboard | Final Year Project</p>
+            <p>This dashboard visualizes online shopping behavior patterns and purchase intentions</p>
+            <p><span class="highlight">Tip:</span> Hover over charts for detailed insights. Data updates in real-time.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Set current time
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Animate metric counters
+        function animateCounter(element, finalValue, isCurrency = false, isPercent = false) {
+            let startValue = 0;
+            const duration = 2000;
+            const increment = finalValue / (duration / 16);
+            const timer = setInterval(() => {
+                startValue += increment;
+                if (startValue >= finalValue) {
+                    startValue = finalValue;
+                    clearInterval(timer);
+                }
+                if (isPercent) {
+                    element.textContent = startValue.toFixed(1) + "%";
+                } else if (isCurrency) {
+                    element.textContent = "$" + startValue.toFixed(2);
+                } else {
+                    element.textContent = Math.floor(startValue).toLocaleString();
+                }
+            }, 16);
+        }
+        
+        // Start animations after page loads
+        setTimeout(() => {
+            animateCounter(document.getElementById('metric1'), 12345);
+            animateCounter(document.getElementById('metric2'), 15.2, false, true);
+            animateCounter(document.getElementById('metric3'), 12.50, true);
+            animateCounter(document.getElementById('metric4'), 8456);
+        }, 500);
+        
+        // Monthly Performance Chart
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        const monthlyChart = new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [
+                    {
+                        label: 'Total Visits',
+                        data: [1250, 1950, 1650, 2350, 1850, 2150, 2450],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Purchases',
+                        data: [188, 293, 248, 353, 278, 323, 368],
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Visitors'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Visitor Distribution Chart
+        const visitorCtx = document.getElementById('visitorChart').getContext('2d');
+        const visitorChart = new Chart(visitorCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Returning Visitors', 'New Visitors', 'Other Visitors'],
+                datasets: [{
+                    data: [65, 25, 10],
+                    backgroundColor: [
+                        'rgba(52, 152, 219, 0.8)',
+                        'rgba(46, 204, 113, 0.8)',
+                        'rgba(155, 89, 182, 0.8)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Sample data for table
+        const sampleData = [
+            { id: 'VIS001', month: 'January', views: 28, value: 16.50, type: 'Returning', revenue: true },
+            { id: 'VIS002', month: 'February', views: 15, value: 9.20, type: 'New', revenue: false },
+            { id: 'VIS003', month: 'March', views: 45, value: 35.80, type: 'Returning', revenue: true },
+            { id: 'VIS004', month: 'April', views: 22, value: 7.90, type: 'Returning', revenue: false },
+            { id: 'VIS005', month: 'May', views: 34, value: 24.60, type: 'New', revenue: true },
+            { id: 'VIS006', month: 'June', views: 31, value: 20.40, type: 'Returning', revenue: true },
+            { id: 'VIS007', month: 'July', views: 18, value: 8.70, type: 'New', revenue: false },
+            { id: 'VIS008', month: 'August', views: 39, value: 28.30, type: 'Returning', revenue: true },
+            { id: 'VIS009', month: 'September', views: 26, value: 14.20, type: 'New', revenue: false },
+            { id: 'VIS010', month: 'October', views: 42, value: 31.50, type: 'Returning', revenue: true }
+        ];
+        
+        // Populate data table
+        const tableBody = document.getElementById('dataTable');
+        sampleData.forEach(visitor => {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td><strong>${visitor.id}</strong></td>
+                <td>${visitor.month}</td>
+                <td>${visitor.views}</td>
+                <td>$${visitor.value.toFixed(2)}</td>
+                <td class="${visitor.type === 'Returning' ? 'visitor-returning' : 'visitor-new'}">
+                    ${visitor.type}
+                </td>
+                <td>
+                    <span class="${visitor.revenue ? 'revenue-yes' : 'revenue-no'}">
+                        ${visitor.revenue ? 'Yes' : 'No'}
+                    </span>
+                </td>
+            `;
+            
+            tableBody.appendChild(row);
+        });
+        
+        // Add some interactivity
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>
